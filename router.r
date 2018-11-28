@@ -1,4 +1,10 @@
+source('~/CMSC150-Project-API/controllers/regression.r')
 
+#* @filter cors
+cors <- function(res) {
+  res$setHeader("Access-Control-Allow-Origin", "*") # Or whatever
+  plumber::forward()
+}
 
 #* Echo back the input
 #* @param msg The message to echo
@@ -19,7 +25,7 @@ function(req){
   result = PolynomialRegression(2, list(x, y))
   augcoeffmatrix = result$augcoeffmatrix;
   unknowns = result$unknowns;
-  
-  
-  list(augcoeffmatrix=augcoeffmatrix, unknowns=unknowns)
+  estimate = result$polynomial_function(as.numeric(formContents$x));
+
+  list(augcoeffmatrix=augcoeffmatrix, unknowns=unknowns, estimate=estimate)
 }
