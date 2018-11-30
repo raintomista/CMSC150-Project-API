@@ -24,11 +24,13 @@ function(req){
   }
   
   result = PolynomialRegression(2, list(x, y))
+  inputValues = result$inputValues;
   augcoeffmatrix = result$augcoeffmatrix;
   unknowns = result$unknowns;
-  estimate = result$polynomial_function(as.numeric(formContents$x));
-
-  list(augcoeffmatrix=augcoeffmatrix, unknowns=unknowns, estimate=estimate)
+  fx = result$polynomial_string;
+  estimate = result$polynomial_function(as.numeric(formContents$valueToEstimate));
+    
+  list(inputValues=inputValues, augcoeffmatrix=augcoeffmatrix, unknowns=unknowns, fx=fx, estimate=estimate)
 }
 
 #* Echo back the input
@@ -48,8 +50,11 @@ function(req){
   }
   
   result = gaussJordanQSI(list(x, y))
+  inputValues = result$inputValues;
   augcoeffmatrix = result$augcoeffmatrix;
   unknowns = result$unknowns;
   
-  list(augcoeffmatrix=augcoeffmatrix, unknowns=unknowns)
+  estimate = result$estimate;
+  
+  list(augcoeffmatrix=augcoeffmatrix, unknowns=unknowns, estimate=estimate)
 }

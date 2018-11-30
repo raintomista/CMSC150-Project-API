@@ -66,10 +66,19 @@ PolynomialRegression <- function(order, list) {
     system[[i]] <- eval(parse(text=equation))
   }
   
+  inputValues <- list;
   augcoeff <- augcoeffmatrix(system);
   unknowns <- gaussJordan(system);
   polynomial_string <- generatePolynomialString(unknowns)
   polynomial_function <- eval(parse(text=polynomial_string))
-  
-  return (list(augcoeffmatrix=augcoeff, unknowns=unknowns, polynomial_string=polynomial_string, polynomial_function=polynomial_function));
+
+  return (
+    list(
+      inputValues=inputValues, 
+      augcoeffmatrix=augcoeff, 
+      unknowns=unknowns, 
+      polynomial_string=polynomial_string, 
+      polynomial_function=polynomial_function
+    )
+  );
 }

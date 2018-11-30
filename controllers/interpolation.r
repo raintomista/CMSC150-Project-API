@@ -93,7 +93,7 @@ augcoeffQSI <- function(equations) {
     }
   }
   
-  mat = mat(unlist(augcoeff), ncol=length(equations)+2, byrow=TRUE);
+  mat = matrix(unlist(augcoeff), ncol=length(equations)+2, byrow=TRUE);
   mat = mat[,-1]
 
   return (mat);
