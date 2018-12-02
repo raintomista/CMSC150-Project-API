@@ -94,15 +94,12 @@ augcoeffQSI <- function(equations) {
   }
   
   mat = matrix(unlist(augcoeff), ncol=length(equations)+2, byrow=TRUE);
-  mat = mat[,-1]
+  mat = mat[,-1]; #remove a1 since it is assumed as zero
 
   return (mat);
 }
 
-gaussJordanQSI <- function(list) {
-  equations = generateEquations(list);
-  matrix = augcoeffQSI(equations)
-  
+gaussJordanQSI <- function(matrix) {
   ncol = ncol(matrix) - 1;
   
   #traverse all columns except RHS
@@ -142,9 +139,33 @@ gaussJordanQSI <- function(list) {
         productRow = mult * matrix[pivotIdx, ]; #multiply the pivot row by the multiplier
         
         matrix[i, ] <- (matrix[i, ] - productRow) #subtract the target row by productRow to eliminate the element tbe
-        
       }
     }
   }
-  return (list(augcoeffmatrix=augcoeffQSI(equations), unknowns=unname(matrix[ ,ncol(matrix)])));
+  
+  
+  return (unname(matrix[ ,ncol(matrix)]));
+}
+
+
+quadraticInterpolation <- function(list) {
+  equations = generateEquations(list);
+  matrix = augcoeffQSI(equations)
+  unknowns = c(0, gaussJordanQSI(matrix));
+  
+  n = length(list[[1]]) - 1;
+  
+  interval_strings = c();
+  interval_functions = list();
+  for(i in 0:(n-1)) {
+    a = unknowns[(i*3)+1];
+    b = unknowns[(i*3)+2];
+    c = unknowns[(i*3)+3];
+    
+    fx = paste("function(x) " , a, "*x^2 + ", b, "*x + ", c, sep=""); 
+    interval_strings[i+1] = fx;
+    interval_functions[[i+1]] = eval(parse(text=interval_strings))
+  }
+  
+  return (list(augcoeffmatrix=matrix, unknowns=unknowns, interval_strings=interval_strings, interval_functions=interval_functions));
 }

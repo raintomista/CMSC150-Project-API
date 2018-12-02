@@ -38,23 +38,41 @@ function(req){
 #* @post /interpolation
 function(req){
   formContents = Rook::Multipart$parse(req);
-  file <- readLines(con = formContents$file$tempfile)
-  data = strsplit(file, '\n');
-  x = c();
-  y = c();
   
+  valueToEvaluate <- as.numeric(formContents$valueToEstimate);
+  file <- readLines(con = formContents$file$tempfile);
+  
+  #get x-y data from file
+  data = strsplit(file, '\n');
+  x = c(); 
+  y = c();
   for(i in 1:length(data)) {
     tuple = strsplit(data[[i]][1], ',');
     x[i] = as.numeric(tuple[[1]][1]);
     y[i] = as.numeric(tuple[[1]][2]);
   }
   
-  result = gaussJordanQSI(list(x, y))
-  inputValues = result$inputValues;
+  #store input values
+  inputValues = list(x,y);
+  
+  #perform gauss jordan
+  result = quadraticInterpolation(list(x, y))
+  
+  #get the augcoeff
   augcoeffmatrix = result$augcoeffmatrix;
+  
+  #get the unknowns
   unknowns = result$unknowns;
   
-  estimate = result$estimate;
+  #get the function strings for each interval
+  interval_strings = result$interval_strings;
+  interval_functions = result$interval_functions;
   
-  list(augcoeffmatrix=augcoeffmatrix, unknowns=unknowns, estimate=estimate)
+  estimates = c();
+  for(i in 1:length(interval_functions)) {
+    estimates[i] = interval_functions[[i]](valueToEvaluate);
+  }
+  
+  
+  list(inputValues=inputValues, augcoeffmatrix=augcoeffmatrix, unknowns=unknowns, interval_strings=interval_strings, estimates=estimates)
 }
