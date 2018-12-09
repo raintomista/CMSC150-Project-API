@@ -1,5 +1,7 @@
 source('~/CMSC150-Project-API/controllers/regression.r')
 source('~/CMSC150-Project-API/controllers/interpolation.r')
+source('~/CMSC150-Project-API/controllers/simplex.r')
+library(jsonlite)
 
 #* @filter cors
 cors <- function(res) {
@@ -76,3 +78,20 @@ function(req){
   
   list(inputValues=inputValues, augcoeffmatrix=augcoeffmatrix, unknowns=unknowns, interval_strings=interval_strings, estimates=estimates)
 }
+
+
+
+
+#* Echo back the input
+#* @param msg The message to echo
+#* @post /minimization
+function(req){
+  reqBody = fromJSON(req$postBody)$data;
+  
+  objective = generateObjectiveFunction(reqBody)
+  constraints = generateConstraints(reqBody)
+  
+  return(Simplex(objective, constraints));
+}
+
+
